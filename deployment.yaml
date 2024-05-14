@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: my-nodejs-app
-          image: krunalijain/devops-playground:latest
+          image: 244933296429.dkr.ecr.us-east-1.amazonaws.com/devops:latest
           ports:
             - containerPort: 3000
