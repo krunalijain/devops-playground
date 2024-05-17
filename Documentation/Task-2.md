@@ -32,7 +32,7 @@ CMD ["node", "server.js"]
 
 To build a docker image run this command by replacing with your preferred <your image name>
 
-```dockerfile
+```bash
 docker build -t your-image-name .
 ```
 
@@ -40,20 +40,20 @@ docker build -t your-image-name .
 
 Once docker image has been built, you can run this command to run the docker on specific port
 
-```dockerfile
+```bash
 docker run -p 3000:3000 your-image-name
 
 ```
 
 You can also verify your docker image built by running this command.
 
-```dockerfile
+```bash
 docker images
 ```
 
 And to verify the running docker images run 
 
-```dockerfile
+```bash
 docker image ps
 ```
 
