@@ -4,7 +4,7 @@ To run the same nodejs app via docker, you need to create a dockerfile and build
 
 ## Create a Dockerfile 
 
-```bash
+```dockerfile
 # Use an official Node.js runtime as the base image
 FROM node:latest
 
