@@ -1,5 +1,6 @@
 ## Deploying Dockerized App on Kubernetes with Load Balancer Access
 
+
 ## Install Kubernetes on Local (Linux OS)
 
 ```
@@ -55,3 +56,68 @@ Follow the steps mentioned over there according to your repo created.
 - Run the following command to push this image to your newly created AWS repository:
     
     `docker push public.ecr.aws/a1d6x4r5/devops:latest`
+
+After running all these commands you will be able to view the image in your ECR repo.
+
+## Creating EKS Cluster & Node group
+
+1) Go to AWS console > EKS > Create a cluster.
+2) Attach appropriate **IAM Role** which is meant for EKS service. It should have **AmazonEKSClusterPolicy** policy permission.
+3) Keep the rest settings as it is > Next > **Attach the default VPC & Subnets** .
+4) Under **Control plane logging**, you can turn on those for logs > click Next > Next > Review > Create.
+
+Once clicked on "Create" it will take few minutes to create a cluster, once cluster is in Active state, we need to create a **"Node gorup"**.
+
+5) Click on created cluster, under **Compute** section you can see Node Groups > Create a Node group from there.
+
+**Note: If the node group create fails, you can check the error under *Health Status*.**
+For me,. the error was regarding `auto assign public IP` was not enabled for Public subnets. You can do this by going to VPC section > Subnets section > Edit the Public Subnets > Enable the `auto assign public IP`.
+And recreate Node Group. 
+
+Once node group is created, we can create 3 pods. Creation of Node group will create 2 EC2 instances (if setitngs were set to default) and an ASG. To verify created node group run:
+
+```
+kubectl get nodes
+```
+
+## Creating 3 pods
+
+To create 3 pods, you need to create a manifest file commonly named as [`deployment.yaml`](https://github.com/krunalijain/devops-playground/blob/main/deployment.yaml).
+
+Once created, run this command in terminal:
+
+```
+kubectl apply -f deployment.yaml
+```
+
+To verify:
+
+```
+kubectl get pods
+```
+
+Once the status shows *runnning*. we are good to proceed for load balancer creation.
+
+## Creating Load Balancer
+
+Create another manifest file, commonly named as [`service.yaml`](https://github.com/krunalijain/devops-playground/blob/main/service.yaml).
+
+Run the command:
+
+```
+kubectl apply -f service.yaml
+
+```
+
+To verify run this below command. You should see your service listed with an external IP assigned.
+
+```
+kubectl get services
+```
+Once completed, you can access it via external IP or DNS of Load Balancer.
+
+```
+http://<external-ip>
+```
+
+
