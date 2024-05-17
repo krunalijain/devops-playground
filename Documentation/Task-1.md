@@ -47,3 +47,5 @@ You can now access the node app on your localhost.
 ## To access the node app
 
 Open your preferred browser and run `http://localhost:3000` in the URL.
+
+![Nodejs simple page](https://github.com/krunalijain/devops-playground/blob/main/Assests/node%20server%20simple%20page.JPG)
