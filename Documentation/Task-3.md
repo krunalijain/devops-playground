@@ -80,6 +80,8 @@ Once node group is created, we can create 3 pods. Creation of Node group will cr
 kubectl get nodes
 ```
 
+![node group running](https://github.com/krunalijain/devops-playground/blob/main/Assests/running%20node%202%20instances.JPG)
+
 ## Creating 3 pods
 
 To create 3 pods, you need to create a manifest file commonly named as [`deployment.yaml`](https://github.com/krunalijain/devops-playground/blob/main/deployment.yaml).
@@ -98,6 +100,8 @@ kubectl get pods
 
 Once the status shows *runnning*. we are good to proceed for load balancer creation.
 
+![3 pods running](https://github.com/krunalijain/devops-playground/blob/main/Assests/running%203%20pods.JPG)
+
 ## Creating Load Balancer
 
 Create another manifest file, commonly named as [`service.yaml`](https://github.com/krunalijain/devops-playground/blob/main/service.yaml).
@@ -114,10 +118,14 @@ To verify run this below command. You should see your service listed with an ext
 ```
 kubectl get services
 ```
+
+![service created](https://github.com/krunalijain/devops-playground/blob/main/Assests/created%20service%20yml%20file%20to%20access%20via%20LB.JPG)
+
 Once completed, you can access it via external IP or DNS of Load Balancer.
 
 ```
 http://<external-ip>
 ```
 
+![accessing via LB](https://github.com/krunalijain/devops-playground/blob/main/Assests/accessing%20via%20LB.JPG)
 
