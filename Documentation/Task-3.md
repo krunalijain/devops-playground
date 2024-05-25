@@ -74,7 +74,13 @@ Once clicked on "Create" it will take few minutes to create a cluster, once clus
 For me,. the error was regarding `auto assign public IP` was not enabled for Public subnets. You can do this by going to VPC section > Subnets section > Edit the Public Subnets > Enable the `auto assign public IP`.
 And recreate Node Group. 
 
-Once node group is created, we can create 3 pods. Creation of Node group will create 2 EC2 instances (if setitngs were set to default) and an ASG. To verify created node group run:
+## Configure `kubectl` to communicate with cluster.
+
+```
+aws eks update-kubeconfig --region `region-name` --name `your-cluster-name`
+```
+
+Once node group is created and kubectl is configured to communicate wiht cluster, we can create 3 pods. Creation of Node group will create 2 EC2 instances (if setitngs were set to default) and an ASG. To verify created node group run:
 
 ```
 kubectl get nodes
