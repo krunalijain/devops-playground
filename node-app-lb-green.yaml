@@ -1,0 +1,14 @@
+# node-app-lb-green.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-app-lb
+spec:
+  selector:
+    app: node-app
+    version: green
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: node-app-blue
+spec:
+  serviceName: "node-app-blue"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: node-app
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: node-app
+        version: blue
+    spec:
+      containers:
+      - name: node-app
+        image: public.ecr.aws/a1d6x4r5/devops:latest
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+        - name: data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
