@@ -1,25 +1,67 @@
-const http = require('http');                         // importing http module from Node.js
-const os = require('os');                             // importing os module to fetch the current os requirements.
+const http = require('http');
+const os = require('os');
+const AWS = require('aws-sdk');
 
-// const hostname = '127.0.0.1';                         // setting constant "hostname" to value local ip of system.
+// Configure AWS SDK [Here You need to specify your AWS region; access & secret access keys if not running the code on AWS and using outside cloud editor or locally.]
+AWS.config.update({
+  region: 'us-east-1',
+  credentials: new AWS.EC2MetadataCredentials({
+    httpOptions: { timeout: 5000 },
+    maxRetries: 10,
+  }),
+});
+
+const s3 = new AWS.S3();
+
+// Define the bucket and key for the image
+const bucketName = 'mydevopspg';
+const imageName = 'imagee.jpg';
+
 const hostname = '0.0.0.0';  // Change to listen on all network interfaces
-const port = 3000;                                  // setting port (usually used for dev purpose)
+const port = 3000;
 
-const server = http.createServer((req, res) => {              // creating a server with callback function along with 2 args. This is for when we request and what response we recieve.
-  res.statusCode = 200;                                      // setting the status code to 200, which means OK (successful)
-  res.setHeader('Content-Type', 'text/html');                // setting content type as text/HTML, so the response will be recieved in this format.
-  const interfaces = os.networkInterfaces();                // this will fetch the interface info of the current OS.
-  let ip = 'Unknown';                                       // to store the IP addr of the server, initializing as unknown.
-  Object.keys(interfaces).forEach((key) => {                // iterates over each network interface
-    interfaces[key].forEach((iface) => { 
-      if (iface.family === 'IPv4' && !iface.internal) {                 // this will check for IPV4 addr and not a loopback addr
-        ip = iface.address;                                          // when condition meets, will set the IP value to this variable.
+const server = http.createServer((req, res) => {
+  const interfaces = os.networkInterfaces();
+  let ip = 'Unknown';
+  Object.keys(interfaces).forEach((key) => {
+    interfaces[key].forEach((iface) => {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        ip = iface.address;
       }
     });
   });
-  res.end(`<h1>Welcome</h1><p>This server is hosted at IP address: ${ip}</p>`);             // will respond the result in this format
+
+  if (req.url === '/') {
+    // Fetch the image from S3
+    const params = {
+      Bucket: bucketName,
+      Key: imageName,
+    };
+
+    s3.getObject(params, (err, data) => {
+      if (err) {
+        console.error(`Error fetching image: ${err.message}`);
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'text/html');
+        res.end(`<h1>Welcome</h1><p>This server is hosted at IP address: ${ip}</p><p>Error fetching image: ${err.message}</p>`);
+      } else {
+        // Convert image data to base64 to embed directly in HTML
+        const base64Image = Buffer.from(data.Body).toString('base64');
+        const imageDataUri = `data:image/jpeg;base64,${base64Image}`;
+
+        // Send HTML response with text and image
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/html');
+        res.end(`<h1>Welcome</h1><p>This server is hosted at IP address: ${ip}</p><img src="${imageDataUri}" alt="S3 Image" />`);
+      }
+    });
+  } else {
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'text/html');
+    res.end('<h1>404 Not Found</h1>');
+  }
 });
 
 server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);                         // starts the serever. This is mentioned in the end because to confirm all the necessary setting are configured properly. Then only it will accept the connection.
+  console.log(`Server running at http://${hostname}:${port}/`);
 });

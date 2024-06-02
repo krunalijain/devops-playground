@@ -8,5 +8,8 @@
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "This repository is your sandbox for exploring DevOps tools and practices. Dive into Docker, Kubernetes, and more.  Each task comes with step-by-step guides to help you learn key concepts hands-on.",
+  "dependencies": {
+    "aws-sdk": "^2.1632.0"
+  }
 }
