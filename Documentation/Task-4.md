@@ -40,29 +40,7 @@ spec:
     app: node-app
 ```
 
-### 3. LoadBalancer Service
-
-You can use a single LoadBalancer service to switch traffic between the blue and green environments.
-
-**loadbalancer-service.yaml:**
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: node-app-lb
-spec:
-  type: LoadBalancer
-  selector:
-    app: node-app
-    version: blue  # Initially point to blue
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 3000
-```
-
-### 4. Apply the Configurations
+### 3. Apply the Configurations
 
 First, apply the headless service and the StatefulSets.
 
@@ -70,10 +48,9 @@ First, apply the headless service and the StatefulSets.
 kubectl apply -f headless-service.yaml
 kubectl apply -f statefulset-blue.yaml
 kubectl apply -f statefulset-green.yaml
-kubectl apply -f loadbalancer-service.yaml
 ```
 
-### 5. Verify the Deployments
+### 4. Verify the Deployments
 
 Ensure that the StatefulSets and the service are running correctly.
 
@@ -81,20 +58,25 @@ Ensure that the StatefulSets and the service are running correctly.
 kubectl get pods
 kubectl get svc
 ```
-### 6. Switch Traffic Between Blue and Green
 
-To switch traffic from the blue deployment to the green deployment, update the selector in the LoadBalancer service.
+### 5. LoadBalancer Service Updation & how to Switch between Blue/Green
 
-```bash
-kubectl patch service node-app-lb -p '{"spec": {"selector": {"app": "node-app", "version": "green"}}}'
+Here, we will create two different lb services for blue & green strategy routing.
+We'll adjust the node-app-lb service to point to either the blue or green deployment depending on the desired version to be live.
+
+- **Initial Blue Deployment Service**  > [node-app-lb-blue.yaml](https://github.com/krunalijain/devops-playground/blob/main/node-app-lb-blue.yaml)
+- Apply the initial service configuration to direct traffic to the blue deployment: 
+
 ```
+kubectl apply -f node-app-lb-blue.yaml
+```
+- **Switch to Green Deployment** > [node-app-lb-green.yaml
+](https://github.com/krunalijain/devops-playground/blob/main/node-app-lb-green.yaml)
+- Apply the service configuration to direct traffic to the green deployment:
 
-## Summary
-
-- You create two separate StatefulSet YAML files for the blue and green environments.
-- A headless service is used to manage the stable network identities for the StatefulSets.
-- A single LoadBalancer service is used to switch traffic between the blue and green StatefulSets by updating the selector.
-
+ ```
+kubectl apply -f node-app-lb-green.yaml
+```
 
 
  
