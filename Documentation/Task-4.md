@@ -78,6 +78,14 @@ kubectl apply -f node-app-lb-blue.yaml
 kubectl apply -f node-app-lb-green.yaml
 ```
 
+## References
+
+- For additional and details understanding on Statefusets, PVs & PVCs, please refer the [official documentation of Kubernetes](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).
+
+- [Blue/Green Deployement Strategy](https://docs.aws.amazon.com/whitepapers/latest/overview-deployment-options/bluegreen-deployments.html#:~:text=A%20blue%2Fgreen%20deployment%20is%20a%20deployment%20strategy%20in,environment%20%28green%29%20is%20running%20the%20new%20application%20version.) : AWS provides amazing documentation on Blue/Green strategy. 
+
+To learn other deployment strategies you can watch [this video](https://youtu.be/AWVTKBUnoIg?si=GcsVDkPhIfU4WQJN). I personally referred it for better understanding on all types of Deployment Strategies.
+
 
  
 
