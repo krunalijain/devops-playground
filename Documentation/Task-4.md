@@ -29,7 +29,7 @@ AWS.config.update({
 });
 
 const s3 = new AWS.S3();
-const bucketName = 'mydevopspg'; [my S3 bucket name]
+const bucketName = 'mydevopspg'; // [my S3 bucket name]
 const objectKey = 'imagee.jpg'; // Path to your image in the bucket ["imagee" is my image name uploaded in S3 bucket]
 
 // Define a route for the root URL
