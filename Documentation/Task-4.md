@@ -1,88 +1,79 @@
-# Implementing Statefulsets, PVs, PVCs, & Blue/Green Strategy
+# Secure Image Upload and Access in S3 for Node.js Application Only.
 
-## StatefulSets
-StatefulSets manage stateful applications in Kubernetes, ensuring each pod has a stable, unique network ID and persistent storage. This is essential for applications needing consistent identifiers or data persistence, such as databases.
+Now, I will upload an image to an S3 bucket, ensuring the bucket is kept private. 
+The image will be configured to be exclusively accessible by my Node.js application, preventing any other service from using it.
 
-## Persistent Volumes (PVs)
-Persistent Volumes (PVs) are storage resources in a Kubernetes cluster. They are provisioned by admins and exist independently of the pods, providing persistent storage that retains data even if the pod is deleted.
+So, to acheive the above task follow the steps below:
 
-## Persistent Volume Claims (PVCs)
-Persistent Volume Claims (PVCs) are user-generated requests for storage, specifying the required size and access modes. PVCs are matched with available PVs, allowing pods to use the specified persistent storage without needing to know the details of the storage infrastructure.
-
-## Blue/Green Strategy
-Blue/Green Strategy is a deployment approach with two identical environments (blue for the current version, green for the new version). The new version (green) is tested in parallel with the old version (blue). Once verified, traffic is switched to green, with the ability to revert to blue if any issues occur, ensuring minimal downtime and risk.
-
-
-## Steps to implement the above discussed strategy & Statefulsets
-
-### 1. Create/Modify your Deployment file to Statefulset.
-We can either create a new or modify an existing one. But, as we are also implementing B&G strategy, it's better we create two different Statefulsets, each for one - Blue Statefulsets & Green Statefulsets.
-
-  - [statefulset-blue.yaml](https://github.com/krunalijain/devops-playground/blob/main/statefulset-blue.yaml)
-  - [statefulset-green.yaml](https://github.com/krunalijain/devops-playground/blob/main/statefulset-green.yaml)
-
-### 2. Headless Service for StatefulSets
-A headless service is necessary for the StatefulSets to maintain stable network identities. 
-
-**headless-service.yaml:**
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: node-app-headless
-spec:
-  ports:
-  - port: 3000
-    name: http
-  clusterIP: None
-  selector:
-    app: node-app
-```
-
-### 3. Apply the Configurations
-
-First, apply the headless service and the StatefulSets.
+### 1. Install the AWS SDK
 
 ```bash
-kubectl apply -f headless-service.yaml
-kubectl apply -f statefulset-blue.yaml
-kubectl apply -f statefulset-green.yaml
+npm install aws-sdk
 ```
 
-### 4. Verify the Deployments
+### 2. Update your node.js app
 
-Ensure that the StatefulSets and the service are running correctly.
+Here, I have updated my `server.js` app, to fetch the S3 image in my app.
 
-```bash
-kubectl get pods
-kubectl get svc
+```js
+const AWS = require('aws-sdk');
+const express = require('express');
+const app = express();
+const port = 3000;
+
+// Configure the AWS region and credentials
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'your_AWS_ACCESS_KEY_ID', // Use environment variables for security
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'your_AWS_SECRET_ACCESS_KEY',
+  region: 'us-east-1'
+});
+
+const s3 = new AWS.S3();
+const bucketName = 'mydevopspg'; [my S3 bucket name]
+const objectKey = 'imagee.jpg'; // Path to your image in the bucket ["imagee" is my image name uploaded in S3 bucket]
+
+// Define a route for the root URL
+app.get('/', (req, res) => {
+  res.send('Welcome to the S3 Image Server!');
+});
+
+// Define a route for fetching the image
+app.get('/image', (req, res) => {
+  const params = {
+    Bucket: bucketName,
+    Key: objectKey
+  };
+
+  s3.getObject(params, (err, data) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error fetching image from S3');
+    } else {
+      res.setHeader('Content-Type', 'image/jpeg'); // Adjust the content type based on your image type
+      res.send(data.Body);
+    }
+  });
+});
+
+// Start the server
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server running at http://0.0.0.0:${port}/`);
+});
+
 ```
 
-### 5. LoadBalancer Service Updation & how to Switch between Blue/Green
+### 3. Test your S3 Image locally
 
-Here, we will create two different lb services for blue & green strategy routing.
-We'll adjust the node-app-lb service to point to either the blue or green deployment depending on the desired version to be live.
-
-- **Initial Blue Deployment Service**  > [node-app-lb-blue.yaml](https://github.com/krunalijain/devops-playground/blob/main/node-app-lb-blue.yaml)
-- Apply the initial service configuration to direct traffic to the blue deployment: 
+To test if your S3 image is being fetched from AWS console on your local machine, you can check by running this locally.
+Run:
 
 ```
-kubectl apply -f node-app-lb-blue.yaml
-```
-- **Switch to Green Deployment** > [node-app-lb-green.yaml
-](https://github.com/krunalijain/devops-playground/blob/main/node-app-lb-green.yaml)
-- Apply the service configuration to direct traffic to the green deployment:
-
- ```
-kubectl apply -f node-app-lb-green.yaml
+node server.js
 ```
 
-## References
+Then route to `/image` in the URL.
 
-- For additional and details understanding on Statefusets, PVs & PVCs, please refer the [official documentation of Kubernetes](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).
 
-- [Blue/Green Deployement Strategy](https://docs.aws.amazon.com/whitepapers/latest/overview-deployment-options/bluegreen-deployments.html#:~:text=A%20blue%2Fgreen%20deployment%20is%20a%20deployment%20strategy%20in,environment%20%28green%29%20is%20running%20the%20new%20application%20version.) : AWS provides amazing documentation on Blue/Green strategy. 
 
 To learn other deployment strategies you can watch [this video](https://youtu.be/AWVTKBUnoIg?si=GcsVDkPhIfU4WQJN). I personally referred it for better understanding on all types of Deployment Strategies.
 
