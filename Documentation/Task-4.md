@@ -1,4 +1,4 @@
-# Secure Image Upload and Access in S3 for Node.js Application Only.
+# Secure Image Upload and Access in S3 for Node.js Application Only
 
 Now, I will upload an image to an S3 bucket, ensuring the bucket is kept private. 
 The image will be configured to be exclusively accessible by my Node.js application, preventing any other service from using it.
