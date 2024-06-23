@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+data:
+  init-database.sql: |
+    CREATE DATABASE IF NOT EXISTS nodejsdb;
+    CREATE USER IF NOT EXISTS 'MYSQL_USERNAME'@'%' IDENTIFIED BY 'MYSQL_PASSWORD';
+    GRANT ALL PRIVILEGES ON MYSQL_DATABASE_NAME.* TO 'MYSQL_USERNAME'@'%';
+    FLUSH PRIVILEGES;

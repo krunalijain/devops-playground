@@ -1,18 +1,35 @@
 const AWS = require('aws-sdk');
 const express = require('express');
+const mysql = require('mysql');
 const app = express();
 const port = 3000;
 
 // Configure the AWS region and credentials
 AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'your_AWS_ACCESS_KEY_ID', // Use environment variables for security
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'your_AWS_ACCESS_KEY_ID',
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'your_AWS_SECRET_ACCESS_KEY',
   region: 'us-east-1'
 });
 
 const s3 = new AWS.S3();
-const bucketName = 'mydevopspg'; // [my S3 bucket name]
-const objectKey = 'imagee.jpg'; // Path to your image in the bucket ["imagee" is my image name uploaded in S3 bucket]
+const bucketName = 'mydevopspg';
+const objectKey = 'imagee.jpg';
+
+// MySQL connection setup
+const db = mysql.createConnection({
+  host: process.env.MYSQL_HOST || 'mysql',
+  user: process.env.MYSQL_USER || 'MYSQL_USERNAME',   // change with real values, here and in configmap, secrete & init.
+  password: process.env.MYSQL_PASSWORD || 'MYSQL_PASSWORD', //change with real values, here and in configmap, secrete & init.
+  database: process.env.MYSQL_DATABASE || 'MYSQL_DATABASE_NAME' // change with real values, here and in configmap, secrete & init.
+});
+
+db.connect(err => {
+  if (err) {
+    console.error('Error connecting to MySQL:', err);
+    return;
+  }
+  console.log('Connected to MySQL');
+});
 
 // Define a route for the root URL
 app.get('/', (req, res) => {
@@ -31,7 +48,7 @@ app.get('/image', (req, res) => {
       console.error(err);
       res.status(500).send('Error fetching image from S3');
     } else {
-      res.setHeader('Content-Type', 'image/jpeg'); // Adjust the content type based on your image type
+      res.setHeader('Content-Type', 'image/jpeg');
       res.send(data.Body);
     }
   });
