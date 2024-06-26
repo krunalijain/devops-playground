@@ -6,8 +6,8 @@ const port = 3000;
 
 // Configure the AWS region and credentials
 AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'your_AWS_ACCESS_KEY_ID',
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'your_AWS_SECRET_ACCESS_KEY',
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   region: 'us-east-1'
 });
 
@@ -17,10 +17,10 @@ const objectKey = 'imagee.jpg';
 
 // MySQL connection setup
 const db = mysql.createConnection({
-  host: process.env.MYSQL_HOST || 'mysql',
-  user: process.env.MYSQL_USER || 'MYSQL_USERNAME',   // change with real values, here and in configmap, secrete & init.
-  password: process.env.MYSQL_PASSWORD || 'MYSQL_PASSWORD', //change with real values, here and in configmap, secrete & init.
-  database: process.env.MYSQL_DATABASE || 'MYSQL_DATABASE_NAME' // change with real values, here and in configmap, secrete & init.
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE
 });
 
 db.connect(err => {
