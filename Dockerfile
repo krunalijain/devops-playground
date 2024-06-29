@@ -1,17 +1,17 @@
 # Use an official Node.js runtime as the base image
-FROM node:latest
+FROM node:14
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json (if available)
-COPY ${APP_DIR}/package.json ./
+COPY package*.json ./
 
 # Install npm dependencies
 RUN npm install
 
-# Copy the server.js file from its absolute path into the Docker image
-COPY ${APP_DIR}/server.js ./
+# Copy the entire application source code into the container
+COPY . .
 
 # Expose the port your app runs on
 EXPOSE 3000
