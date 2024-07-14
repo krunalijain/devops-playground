@@ -1,22 +1,22 @@
-const AWS = require('aws-sdk');
-const express = require('express');
-const mysql = require('mysql');
+import { config, S3 } from 'aws-sdk';
+import express from 'express';
+import { createConnection } from 'mysql';
 const app = express();
 const port = 3000;
 
 // Configure the AWS region and credentials
-AWS.config.update({
+config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   region: 'us-east-1'
 });
 
-const s3 = new AWS.S3();
+const s3 = new S3();
 const bucketName = 'mydevopspg';
 const objectKey = 'imagee.jpg';
 
 // MySQL connection setup
-const db = mysql.createConnection({
+const db = createConnection({
   host: process.env.MYSQL_HOST,
   user: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
